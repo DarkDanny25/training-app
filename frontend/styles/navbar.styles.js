@@ -11,6 +11,10 @@ export const NavbarContainer = styled.div`
   width: 100%;
   top: 0;
   z-index: 1000;
+
+  @media (max-width: 768px) {
+    padding: 10px 15px;
+  }
 `;
 
 export const LeftSection = styled.div`
@@ -25,6 +29,10 @@ export const LogoContainer = styled.div`
   font-size: 18px;
   font-weight: bold;
   color: white;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 export const RightSection = styled.div`
@@ -72,6 +80,7 @@ export const NavButton = styled.button`
 
   @media (max-width: 768px) {
     margin: 10px 0;
+    font-size: 14px;
   }
 `;
 
@@ -141,6 +150,18 @@ export const GoodbyeMessage = styled.div`
   align-items: center;
   z-index: 1000;
   animation: slideIn 0.5s ease-out, fadeOut 1s 2s forwards;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    padding: 10px 20px;
+    width: 80%;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+    padding: 8px 15px;
+    width: 90%;
+  }
 
   @keyframes slideIn {
     0% {
