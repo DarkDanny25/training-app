@@ -30,7 +30,7 @@ const Welcome = () => {
       }
 
       try {
-        const { data } = await axios.get('https://backend-app-training.onrender.com/api/users/profile', {
+        const { data } = await axios.get('http://localhost:5000/api/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(data);

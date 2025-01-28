@@ -33,7 +33,7 @@ const EditFAQ = () => {
       const fetchFAQ = async () => {
         try {
           const token = localStorage.getItem('token');
-          const response = await axios.get(`https://backend-app-training.onrender.com/api/faqs/${id}`, {
+          const response = await axios.get(`http://localhost:5000/api/faqs/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setFaq(response.data);
@@ -78,7 +78,7 @@ const EditFAQ = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `https://backend-app-training.onrender.com/api/faqs/${id}`,
+        `http://localhost:5000/api/faqs/${id}`,
         updatedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

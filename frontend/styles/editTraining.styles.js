@@ -42,6 +42,7 @@ export const Title = styled.h1`
 `;
 
 export const Input = styled.input`
+  background-color: #f1f1f1;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -60,6 +61,7 @@ export const Input = styled.input`
 `;
 
 export const Textarea = styled.textarea`
+  background-color: #f1f1f1;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -82,6 +84,7 @@ export const Textarea = styled.textarea`
 `;
 
 export const Select = styled.select`
+  background-color: #f1f1f1;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;

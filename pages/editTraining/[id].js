@@ -48,7 +48,7 @@ const EditTraining = () => {
     const fetchTraining = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`https://backend-app-training.onrender.com/api/training/${id}`, {
+        const response = await axios.get(`http://localhost:5000/api/training/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const { title, description, type, roles, fileUrl, section, module, submodule } = response.data;
@@ -56,7 +56,7 @@ const EditTraining = () => {
         setInitialData({ title, description, type, roles, section, module, submodule });
 
         if (fileUrl) {
-          setPreviewUrl(`https://backend-app-training.onrender.com${fileUrl}`);
+          setPreviewUrl(`http://localhost:5000${fileUrl}`);
         }
 
         setLoading(false);
@@ -139,7 +139,7 @@ const EditTraining = () => {
     if (file) data.append('file', file);
 
     try {
-      await axios.put(`https://backend-app-training.onrender.com/api/training/${id}`, data, {
+      await axios.put(`http://localhost:5000/api/training/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
       });
 

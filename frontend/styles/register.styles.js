@@ -149,8 +149,8 @@ export const TogglePasswordButton = styled.button`
   font-size: 18px;
   color: #888;
 
-  &:focus {
-    outline: none;
+  &:hover {
+    color: #555;
   }
 
   @media (max-width: 480px) {

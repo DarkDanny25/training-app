@@ -22,6 +22,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [notification, setNotification] = useState(null);
   const [showTip, setShowTip] = useState(false);
+  const [tipDisabled, setTipDisabled] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e) => {
@@ -29,7 +30,7 @@ const Register = () => {
     setNotification(null);
 
     try {
-      const response = await axios.post('https://backend-app-training.onrender.com/api/users/register', { name, email, password });
+      const response = await axios.post('http://localhost:5000/api/users/register', { name, email, password });
       if (response.status === 201) {
         setNotification({ message: 'Registro exitoso. Por favor, Inicia Sesión.', type: 'success' });
         setTimeout(() => {
@@ -46,14 +47,24 @@ const Register = () => {
     setShowPassword(prevState => !prevState);
   };
 
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 2000);
-      return () => clearTimeout(timer);
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+
+    if (!tipDisabled) {
+      setShowTip(false);
+      setTipDisabled(true);
     }
-  }, [notification]);
+  };
+
+  const handleFieldFocus = () => {
+    if (!tipDisabled) {
+      setShowTip(true);
+    }
+  };
+
+  const handleFieldBlur = () => {
+    setShowTip(false);
+  };
 
   return (
     <>
@@ -71,11 +82,13 @@ const Register = () => {
             required
           />
         </div>
-        <div style={{ position: 'relative' }} 
-             onFocus={() => setShowTip(true)} 
-             onBlur={() => setShowTip(false)} 
-             onMouseEnter={() => setShowTip(true)} 
-             onMouseLeave={() => setShowTip(false)}>
+        <div 
+          style={{ position: 'relative' }} 
+          onFocus={handleFieldFocus}
+          onBlur={handleFieldBlur}
+          onMouseEnter={handleFieldFocus}
+          onMouseLeave={handleFieldBlur}
+        >
           <IconWrapper>
             <FontAwesomeIcon icon={faEnvelope} />
           </IconWrapper>
@@ -83,7 +96,7 @@ const Register = () => {
             type="email"
             placeholder="Correo electrónico"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             required
           />
           {showTip && (

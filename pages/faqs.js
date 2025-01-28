@@ -46,7 +46,7 @@ const FAQTable = () => {
           return;
         }
 
-        const response = await axios.get('https://backend-app-training.onrender.com/api/faqs', {
+        const response = await axios.get('http://localhost:5000/api/faqs', {
           headers: { Authorization: `Bearer ${token}`},
         });
         setFaqs(response.data);
@@ -66,7 +66,7 @@ const FAQTable = () => {
   const filteredFaqs = faqs.filter(faq =>
     faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
     faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faq.roles.toLowerCase().includes(searchTerm.toLowerCase())
+    faq.roles.join(', ').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastFAQ = currentPage * faqsPerPage;
@@ -90,7 +90,7 @@ const FAQTable = () => {
         return;
       }
 
-      await axios.delete(`https://backend-app-training.onrender.com/api/faqs/${selectedFAQ._id}`, {
+      await axios.delete(`http://localhost:5000/api/faqs/${selectedFAQ._id}`, {
         headers: { Authorization: `Bearer ${token}`}, 
       });
       setFaqs(prevFaqs => prevFaqs.filter(f => f._id !== selectedFAQ._id));

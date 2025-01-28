@@ -31,7 +31,7 @@ const CapacitationPage = () => {
           return;
         }
 
-        const response = await axios.get('https://backend-app-training.onrender.com/api/training', {
+        const response = await axios.get('http://localhost:5000/api/training', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -49,7 +49,7 @@ const CapacitationPage = () => {
   }, []);
 
   const renderMaterialLink = (material) => {
-    const baseUrl = 'https://backend-app-training.onrender.com';
+    const baseUrl = 'http://localhost:5000';
     return (
       <MaterialLink href={`${baseUrl}${material.fileUrl}`} target="_blank">
         {material.type === 'video' ? 'Ver Video' : 'Ver Documento'}

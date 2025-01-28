@@ -41,6 +41,7 @@ export const EditFAQTitle = styled.h1`
 `;
 
 export const EditFAQInput = styled.input`
+ background-color: #f1f1f1;
   width: 100%;
   padding: 12px;
   margin: 10px 0;
@@ -61,6 +62,7 @@ export const EditFAQInput = styled.input`
 `;
 
 export const EditFAQTextArea = styled.textarea`
+  background-color: #f1f1f1;
   width: 100%;
   padding: 12px;
   margin: 10px 0;

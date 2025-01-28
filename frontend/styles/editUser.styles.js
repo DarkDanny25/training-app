@@ -45,7 +45,7 @@ export const EditUserInput = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
-  background-color: #f9f9f9;
+  background-color: #f1f1f1;
   transition: border-color 0.3s;
 
   &:focus {

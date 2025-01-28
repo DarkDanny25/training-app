@@ -31,7 +31,7 @@ const EditUser = () => {
 
   useEffect(() => {
     if (id) {
-      axios.get(`https://backend-app-training.onrender.com/api/users/list/${id}`, {
+      axios.get(`http://localhost:5000/api/users/list/${id}`, {
         headers: { Authorization: `Bearer ${getToken()}`},
       })
       .then(response => {
@@ -62,7 +62,7 @@ const EditUser = () => {
     }
 
     try {
-      await axios.put(`https://backend-app-training.onrender.com/api/users/update/${id}`, updatedData, {
+      await axios.put(`http://localhost:5000/api/users/update/${id}`, updatedData, {
         headers: { Authorization: `Bearer ${getToken()}`},
       });
       setNotificationMessage('Usuario actualizado con éxito');

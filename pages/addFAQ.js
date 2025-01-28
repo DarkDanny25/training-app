@@ -44,7 +44,7 @@ const AddFAQ = () => {
 
     try {
       const response = await axios.post(
-        'https://backend-app-training.onrender.com/api/faqs',
+        'http://localhost:5000/api/faqs',
         { question, answer, roles },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}}
       );

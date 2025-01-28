@@ -92,7 +92,7 @@ const AddTraining = () => {
     data.append('file', file);
 
     try {
-      await axios.post('https://backend-app-training.onrender.com/api/training', data, {
+      await axios.post('http://localhost:5000/api/training', data, {
         headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}`},
       });
       showNotification('Capacitación agregada con éxito');

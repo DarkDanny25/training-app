@@ -78,10 +78,18 @@ export const Icon = styled.div`
 
 export const ToggleIcon = styled.div`
   position: absolute;
-  right: 10px;
-  color: #666;
-  font-size: 20px;
+  right: 15px;
+  top: 53%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 18px;
   cursor: pointer;
+  border: none;
+  background-color: transparent;
+
+  &:hover {
+    color: #555;
+  }
 `;
 
 export const Input = styled.input`

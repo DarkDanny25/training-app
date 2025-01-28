@@ -41,7 +41,7 @@ const TrainingTable = () => {
 
   const fetchTrainings = async () => {
     try {
-      const { data } = await axios.get('https://backend-app-training.onrender.com/api/training', {
+      const { data } = await axios.get('http://localhost:5000/api/training', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       const trainingsArray = Object.values(data).flatMap(modules => Object.values(modules).flatMap(training => training));
@@ -73,7 +73,7 @@ const TrainingTable = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://backend-app-training.onrender.com/api/training/${selectedTraining._id}`, {
+      await axios.delete(`http://localhost:5000/api/training/${selectedTraining._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setTrainings(trainings.filter(t => t._id !== selectedTraining._id));
