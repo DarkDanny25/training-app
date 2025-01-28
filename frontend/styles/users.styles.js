@@ -206,8 +206,13 @@ export const PaginationContainer = styled.div`
   justify-content: center;
   margin-top: 20px;
   padding: 10px 0;
-
+ 
   @media (max-width: 768px) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  @media (max-width: 480px) {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
@@ -238,12 +243,12 @@ export const PaginationButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    font-size: 12px;
+    font-size: 16px;
     padding: 6px 12px;
   }
 
   @media (max-width: 480px) {
-    font-size: 10px;
+    font-size: 20px;
     padding: 4px 8px;
   }
 `;

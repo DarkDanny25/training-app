@@ -10,8 +10,8 @@ import {
   UserButton, 
   LogoContainer, 
   GoodbyeMessage, 
-  HamburgerMenu,
-  Divider
+  HamburgerMenu, 
+  Divider 
 } from '../styles/navbar.styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCog, faSignOutAlt, faBars, faTimes, faHandshake } from '@fortawesome/free-solid-svg-icons';
@@ -21,18 +21,15 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [role, setRole] = useState(null);
   const [goodbyeMessage, setGoodbyeMessage] = useState('');
+  const [windowWidth, setWindowWidth] = useState(0);
   const router = useRouter();
   const currentPath = router.pathname;
   const dropdownRef = useRef(null);
   const userButtonRef = useRef(null);
 
   const hideNavbarRoutes = [
-    '/addTraining',
-    '/addFAQ',
-    '/editTraining/[id]',
-    '/editFAQ/[id]',
-    '/editUser/[id]',
-    '/welcome',
+    '/addTraining', '/addFAQ', '/editTraining/[id]', '/editFAQ/[id]',
+    '/editUser/[id]', '/welcome'
   ];
 
   useEffect(() => {
@@ -70,15 +67,29 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [handleClickOutside]);
 
-  if (hideNavbarRoutes.includes(currentPath)) return null;
-  if (!role) return null;
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+    }
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (windowWidth >= 1024) {
+      setMobileMenuOpen(false);
+      setDropdownOpen(false);
+    } else {
+      setMobileMenuOpen(false);
+      setDropdownOpen(false);
+    }
+  }, [windowWidth]);
+
+  if (hideNavbarRoutes.includes(currentPath) || !role) return null;
 
   const handleLogoClick = () => {
-    if (role === 'admin') {
-      router.push('/table');
-    } else {
-      router.push('/training');
-    }
+    router.push(role === 'admin' ? '/table' : '/training');
   };
 
   const handleNavButtonClick = (path) => {
@@ -115,7 +126,6 @@ const Navbar = () => {
             <NavButton onClick={() => handleNavButtonClick('/faqPage')} active={currentPath === '/faqPage'}>FAQ</NavButton>
           </>
         )}
-
         {mobileMenuOpen && (
           <>
             <Divider />
