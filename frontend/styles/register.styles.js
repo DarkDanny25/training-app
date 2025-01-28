@@ -201,6 +201,7 @@ export const TipMessage = styled.p`
   z-index: 1;
   animation: ${slideIn} 0.3s ease-out;
   transition: opacity 0.3s;
+  pointer-events: none;
 
   &::before {
     content: '';
