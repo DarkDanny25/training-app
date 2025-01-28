@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { Button, Input, FormContainer, Title, IconWrapper, TextRedirect, TogglePasswordButton, Notification } from '../frontend/styles/register.styles';
+import { 
+  Button, 
+  Input, 
+  FormContainer, 
+  Title, 
+  IconWrapper, 
+  TextRedirect, 
+  TogglePasswordButton, 
+  Notification, 
+  TipMessage 
+} from '../frontend/styles/register.styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faExclamationCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,6 +21,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [showTip, setShowTip] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e) => {
@@ -60,7 +71,11 @@ const Register = () => {
             required
           />
         </div>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative' }} 
+             onFocus={() => setShowTip(true)} 
+             onBlur={() => setShowTip(false)} 
+             onMouseEnter={() => setShowTip(true)} 
+             onMouseLeave={() => setShowTip(false)}>
           <IconWrapper>
             <FontAwesomeIcon icon={faEnvelope} />
           </IconWrapper>
@@ -71,6 +86,11 @@ const Register = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {showTip && (
+            <TipMessage>
+              Tip: El email de acceso es tu mismo rol, por ejemplo: <b>@adviser.com</b> es para asesores.
+            </TipMessage>
+          )}
         </div>
         <div style={{ position: 'relative' }}>
           <IconWrapper>
@@ -87,6 +107,7 @@ const Register = () => {
             <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
           </TogglePasswordButton>
         </div>
+
         <Button type="submit">Registrarme</Button>
         <TextRedirect>
           ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>

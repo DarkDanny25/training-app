@@ -184,3 +184,48 @@ export const Notification = styled.div`
     font-size: 14px;
   }
 `;
+
+export const TipMessage = styled.p`
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  background-color: #ffcc00;
+  color: #292929;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  animation: ${slideIn} 0.3s ease-out;
+  transition: opacity 0.3s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px;
+    border-style: solid;
+    border-color: #ffcc00 transparent transparent transparent;
+  }
+
+  b {
+    color: #d45f00;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+    padding: 10px;
+    width: 250px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+    padding: 8px;
+    width: 220px;
+  }
+`;
