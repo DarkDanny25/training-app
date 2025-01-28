@@ -35,6 +35,56 @@ export const Title = styled.h1`
   }
 `;
 
+export const InputSearch = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+
+  input {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: inherit;
+    transition: border-color 0.3s;
+
+    @media (max-width: 768px) {
+      font-size: 14px;
+      padding: 10px 35px 10px 10px;
+    }
+
+    @media (max-width: 425px) {
+      font-size: 12px;
+      padding: 8px 30px 8px 10px;
+    }
+  }
+
+  &:focus-within input {
+    border-color: #1e1e1e;
+    outline: none;
+  }
+`;
+
+export const IconWrapper = styled.div`
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #888;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 425px) {
+    font-size: 16px;
+  }
+`;
+
 export const SectionTitle = styled.h2`
   font-size: 24px;
   font-weight: bold;

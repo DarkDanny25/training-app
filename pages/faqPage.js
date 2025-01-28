@@ -50,8 +50,9 @@ const FAQs = () => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
 
-    const filtered = faqs.filter(({ question }) =>
-      question.toLowerCase().includes(query)
+    const filtered = faqs.filter(({ question, answer }) =>
+      question.toLowerCase().includes(query) ||
+      answer.toLowerCase().includes(query)
     );
     setFilteredFaqs(filtered);
   };

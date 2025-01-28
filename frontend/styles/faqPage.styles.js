@@ -5,7 +5,7 @@ export const Container = styled.div`
   max-width: 90%;
   margin: 50px auto;
   padding: 20px;
-  overflow-wrap: break-word; /* Permite que el texto largo se ajuste */
+  overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
 

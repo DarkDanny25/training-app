@@ -14,12 +14,16 @@ import {
   SectionDivider,
   ContentContainer,
   ErrorBadge,
+  InputSearch,
+  IconWrapper,
 } from '../frontend/styles/training.styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const CapacitationPage = () => {
   const [materials, setMaterials] = useState({});
+  const [filteredMaterials, setFilteredMaterials] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
   const [noMaterialsError, setNoMaterialsError] = useState(false);
 
   useEffect(() => {
@@ -39,6 +43,7 @@ const CapacitationPage = () => {
           setNoMaterialsError(true);
         } else {
           setMaterials(response.data);
+          setFilteredMaterials(response.data);
         }
       } catch (err) {
         console.error('Error al cargar los materiales de capacitación:', err);
@@ -47,6 +52,38 @@ const CapacitationPage = () => {
 
     fetchMaterials();
   }, []);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = Object.keys(materials).reduce((acc, section) => {
+      const filteredModules = Object.keys(materials[section]).reduce((modAcc, module) => {
+        const filteredMaterialsForModule = materials[section][module].filter((material) => {
+          return (
+            material.title.toLowerCase().includes(query) ||
+            material.description.toLowerCase().includes(query) ||
+            (material.roles && material.roles.join(' ').toLowerCase().includes(query)) ||
+            (material.submodule && material.submodule.toLowerCase().includes(query))
+          );
+        });
+
+        if (filteredMaterialsForModule.length > 0) {
+          modAcc[module] = filteredMaterialsForModule;
+        }
+
+        return modAcc;
+      }, {});
+
+      if (Object.keys(filteredModules).length > 0) {
+        acc[section] = filteredModules;
+      }
+
+      return acc;
+    }, {});
+
+    setFilteredMaterials(filtered);
+  };
 
   const renderMaterialLink = (material) => {
     const baseUrl = 'http://localhost:5000';
@@ -60,21 +97,30 @@ const CapacitationPage = () => {
   return (
     <ContentContainer>
       <Title>Material de Capacitación</Title>
+      
+      <InputSearch value={searchQuery} onChange={handleSearch}>
+        <input type="text" placeholder="Búsqueda de Materiales..." />
+        <IconWrapper>
+          <FontAwesomeIcon icon={faSearch} />
+        </IconWrapper>
+      </InputSearch>
+      
       <SectionDivider />
+
       {noMaterialsError ? (
         <ErrorBadge>
           <FontAwesomeIcon icon={faExclamationCircle} style={{ fontSize: '15px' }} /> No hay materiales de capacitación disponibles.
         </ErrorBadge>
       ) : (
-        Object.keys(materials).map((section) => (
+        Object.keys(filteredMaterials).map((section) => (
           <div key={section}>
             <SectionTitle>Sección: {section}</SectionTitle>
-            {Object.keys(materials[section]).map((module) => (
+            {Object.keys(filteredMaterials[section]).map((module) => (
               <div key={module}>
                 <ModuleContainer>
                   <ModuleTitle>Módulo: {module || 'Sin módulo'}</ModuleTitle>
-                  {materials[section][module].length > 0 ? (
-                    materials[section][module].map((material) => (
+                  {filteredMaterials[section][module].length > 0 ? (
+                    filteredMaterials[section][module].map((material) => (
                       <MaterialContainer key={material._id}>
                         <MaterialTitle>Título: {material.title}</MaterialTitle>
                         <MaterialDescription>Descripción: {material.description}</MaterialDescription>
