@@ -50,11 +50,19 @@ const ForgotPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setNotification({ message: 'Las contraseñas no coinciden', type: 'error' });
+  
+    if (!newPassword || !confirmPassword) {
+      setNotification({ message: 'Por favor, ingresa una nueva contraseña y confírmala.', type: 'error' });
       setTimeout(() => setNotification(null), 3000);
       return;
     }
+  
+    if (newPassword !== confirmPassword) {
+      setNotification({ message: 'Las contraseñas no coinciden.', type: 'error' });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+  
     try {
       await axios.post('http://localhost:5000/api/users/reset-password', { token: resetToken, newPassword });
       setShowModal(false);
@@ -62,7 +70,7 @@ const ForgotPassword = () => {
       setNewPassword('');
       setConfirmPassword('');
       setNotification({ message: 'Contraseña restablecida exitosamente', type: 'success' });
-
+  
       setTimeout(() => {
         setNotification(null);
         router.push('/login');
@@ -72,7 +80,7 @@ const ForgotPassword = () => {
       setTimeout(() => setNotification(null), 3000);
     }
   };
-
+  
   const handleCancel = () => {
     setEmail('');
     setNewPassword('');
