@@ -86,13 +86,14 @@ const CapacitationPage = () => {
   };
 
   const renderMaterialLink = (material) => {
-    const baseUrl = 'http://localhost:5000';
+    const fileUrl = material.fileUrl.startsWith('http') ? material.fileUrl : `http://localhost:5000${material.fileUrl}`;
+  
     return (
-      <MaterialLink href={`${baseUrl}${material.fileUrl}`} target="_blank">
+      <MaterialLink href={fileUrl} target="_blank" rel="noopener noreferrer">
         {material.type === 'video' ? 'Ver Video' : 'Ver Documento'}
       </MaterialLink>
     );
-  };
+  };  
 
   return (
     <ContentContainer>

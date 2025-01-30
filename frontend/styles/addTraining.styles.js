@@ -113,21 +113,30 @@ export const FileInput = styled.div`
     display: none;
   }
 
-  img,
-  video,
-  embed {
-    max-width: 100%;
-    max-height: 300px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 10px;
-    object-fit: contain;
-  }
-
   @media (max-width: 768px) {
     label {
       font-size: 14px;
     }
+  }
+`;
+
+export const PreviewContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  height: 250px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 10px;
+  background-color: #f8f8f8;
+
+  embed, video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 `;
 

@@ -141,7 +141,7 @@ const TrainingTable = () => {
                   <TableCell className="center">{truncateText(training.module, 30, 'Módulo no disponible')}</TableCell>
                   <TableCell className="center">{truncateText(training.submodule, 30, 'Submódulo no disponible')}</TableCell>
                   <TableCell className="center">
-                    <FileLink href={`http://localhost:5000${training.fileUrl}`} target="_blank" rel="noopener noreferrer">
+                    <FileLink href={training.fileUrl} target="_blank" rel="noopener noreferrer">
                       {truncateText(training.originalFileName, 30)}
                     </FileLink>
                   </TableCell>

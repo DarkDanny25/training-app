@@ -33,9 +33,9 @@ const EditTraining = () => {
     submodule: '',
   });
   const [initialData, setInitialData] = useState(null);
-  const [file, setFile] = useState(null);
+  const [fileUrl, setFileUrl] = useState('');
+  const [originalFileName, setOriginalFileName] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -44,6 +44,11 @@ const EditTraining = () => {
   const allRoles = ['asesor', 'asesorJR', 'gerente_sucursal', 'gerente_zona'];
   const allTypes = ['document', 'video'];
 
+  const supportedTypes = {
+    document: ['pdf', 'docx', 'pptx'],
+    video: ['mp4'],
+  };
+
   useEffect(() => {
     const fetchTraining = async () => {
       try {
@@ -51,18 +56,21 @@ const EditTraining = () => {
         const response = await axios.get(`http://localhost:5000/api/training/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const { title, description, type, roles, fileUrl, section, module, submodule } = response.data;
+
+        const { title, description, type, roles, fileUrl, section, module, submodule, originalFileName } = response.data;
         setFormData({ title, description, type, roles, section, module, submodule });
-        setInitialData({ title, description, type, roles, section, module, submodule });
+        setInitialData({ title, description, type, roles, section, module, submodule, fileUrl, originalFileName });
 
         if (fileUrl) {
-          setPreviewUrl(`http://localhost:5000${fileUrl}`);
+          setFileUrl(fileUrl);
+          setOriginalFileName(originalFileName);
+          setPreviewUrl(fileUrl);
         }
 
         setLoading(false);
       } catch (err) {
-        setError('Error al cargar los datos del material');
         setLoading(false);
+        handleNotification('Error al cargar los datos del material', 'error');
       }
     };
 
@@ -74,32 +82,6 @@ const EditTraining = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    const supportedTypes = {
-      document: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-powerpoint'],
-      video: ['video/mp4'],
-    };
-
-    if (!selectedFile) {
-      setFile(null);
-      setPreviewUrl('');
-      setError('Por favor, selecciona un archivo');
-      return;
-    }
-
-    const isValidType = supportedTypes[formData.type]?.includes(selectedFile.type);
-    if (isValidType) {
-      setFile(selectedFile);
-      setPreviewUrl(URL.createObjectURL(selectedFile));
-      setError('');
-    } else {
-      setFile(null);
-      setPreviewUrl('');
-      setError('El tipo de archivo no coincide con el tipo seleccionado');
-    }
-  };
-
   const toggleRole = (role) => {
     setFormData((prev) => {
       const newRoles = prev.roles.includes(role)
@@ -109,6 +91,54 @@ const EditTraining = () => {
     });
   };
 
+  const handleWidgetOpen = () => {
+    const widget = window.cloudinary.createUploadWidget(
+      {
+        cloudName: 'darkdanny25',
+        uploadPreset: 'jewl7kdx',
+        sources: ['local', 'url', 'camera', 'dropbox', 'facebook', 'instagram'],
+        resourceType: 'auto',
+      },
+      (error, result) => {
+        if (error) {
+          setNotificationMessage('Error al cargar el archivo');
+          setNotificationType('error');
+          setShowNotification(true);
+          return;
+        }
+
+        if (result.event === 'success') {
+          const uploadedFile = result.info;
+          const fileExtension = uploadedFile.format.toLowerCase();
+
+          if (formData.type && !supportedTypes[formData.type]?.includes(fileExtension)) {
+            setFileUrl('');
+            setPreviewUrl('');
+            setNotificationMessage('El tipo de archivo no coincide con el tipo seleccionado');
+            setNotificationType('error');
+            setShowNotification(true);
+            return;
+          }
+
+          setFileUrl(uploadedFile.secure_url);
+          setOriginalFileName(uploadedFile.original_filename);
+          setPreviewUrl(uploadedFile.secure_url);
+          setNotificationMessage('Archivo cargado con éxito');
+          setNotificationType('success');
+          setShowNotification(true);
+        }
+      }
+    );
+    widget.open();
+  };
+
+  const handleNotification = (message, type = 'success') => {
+    setNotificationMessage(message);
+    setNotificationType(type);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -116,48 +146,42 @@ const EditTraining = () => {
 
     const updatedData = {
       ...formData,
-      section: formData.section === null ? '' : formData.section,
-      module: formData.module === null ? '' : formData.module,
-      submodule: formData.submodule === null ? '' : formData.submodule,
+      fileUrl: fileUrl || initialData.fileUrl,
+      originalFileName: originalFileName || initialData.originalFileName,
     };
 
-    if (JSON.stringify(initialData) === JSON.stringify(updatedData) && file === null) {
-      setNotificationMessage('No se realizaron cambios');
-      setNotificationType('error');
-      setShowNotification(true);
+    const hasChanges = Object.keys(updatedData).some((key) => {
+      return JSON.stringify(updatedData[key]) !== JSON.stringify(initialData[key]);
+    });
+
+    if (formData.type !== initialData.type && fileUrl) {
+      const fileExtension = fileUrl.split('.').pop().toLowerCase();
+      if (!supportedTypes[formData.type]?.includes(fileExtension)) {
+        setNotificationMessage('El nuevo archivo no coincide con el tipo seleccionado');
+        setNotificationType('error');
+        setShowNotification(true);
+        return;
+      }
+    }
+
+    if (!hasChanges) {
+      handleNotification('No se realizaron cambios', 'error');
       return;
     }
 
-    const data = new FormData();
-    data.append('title', updatedData.title);
-    data.append('description', updatedData.description);
-    data.append('type', updatedData.type);
-    updatedData.roles.forEach((role) => data.append('roles', role));
-    data.append('section', updatedData.section);
-    data.append('module', updatedData.module);
-    data.append('submodule', updatedData.submodule);
-    if (file) data.append('file', file);
-
     try {
-      await axios.put(`http://localhost:5000/api/training/${id}`, data, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
+      await axios.put(`http://localhost:5000/api/training/${id}`, updatedData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      setNotificationMessage('Capacitación actualizada con éxito');
-      setNotificationType('success');
-      setShowNotification(true);
-
-      setTimeout(() => {
-        router.push('/table');
-      }, 3000);
+      handleNotification('Capacitación actualizada con éxito');
+      setTimeout(() => router.push('/table'), 3000);
     } catch (error) {
-      setError(error.response?.data?.error || 'Error al actualizar la capacitación');
+      handleNotification(error.response?.data?.error || 'Error al actualizar la capacitación', 'error');
     }
   };
 
-  const getDisplayValue = (value) => {
-    return value === null || value === '' ? '' : value;
-  };
+  const getDisplayValue = (value) => value || '';
 
   if (loading) return <p>Cargando datos...</p>;
 
@@ -166,23 +190,12 @@ const EditTraining = () => {
       {showNotification && (
         <Notification message={notificationMessage} type={notificationType} onClose={() => setShowNotification(false)} />
       )}
+
       <Form onSubmit={handleSubmit}>
         <Title>Editar Capacitación</Title>
-        <Input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Título"
-          required
-        />
-        <Textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Descripción"
-          required
-        />
+        <Input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Título" required />
+        <Textarea name="description" value={formData.description} onChange={handleChange} placeholder="Descripción" required />
+        
         <Select name="type" value={formData.type} onChange={handleChange} required>
           <option value="">Seleccione un tipo</option>
           {allTypes.map((type) => (
@@ -191,55 +204,34 @@ const EditTraining = () => {
             </option>
           ))}
         </Select>
-        <Input
-          type="text"
-          name="section"
-          value={getDisplayValue(formData.section)}
-          onChange={handleChange}
-          placeholder="Sección"
-          required
-        />
-        <Input
-          type="text"
-          name="module"
-          value={getDisplayValue(formData.module)}
-          onChange={handleChange}
-          placeholder="Módulo"
-        />
-        <Input
-          type="text"
-          name="submodule"
-          value={getDisplayValue(formData.submodule)}
-          onChange={handleChange}
-          placeholder="Submódulo (opcional)"
-        />
+        
+        <Input type="text" name="section" value={getDisplayValue(formData.section)} onChange={handleChange} placeholder="Sección" required />
+        <Input type="text" name="module" value={getDisplayValue(formData.module)} onChange={handleChange} placeholder="Módulo" />
+        <Input type="text" name="submodule" value={getDisplayValue(formData.submodule)} onChange={handleChange} placeholder="Submódulo (opcional)" />
+        
         <FileInput>
-          <label>
-            <FontAwesomeIcon icon={faUpload} />
-            &nbsp;Seleccionar Archivo
-            <input type="file" onChange={handleFileChange} />
+          <label onClick={handleWidgetOpen}>
+            <FontAwesomeIcon icon={faUpload} /> Seleccionar Archivo
           </label>
-          {previewUrl && <embed src={previewUrl} type={file?.type} width="800" height="400" />}
+          {previewUrl && <embed src={previewUrl} type="application/pdf" width="800" height="400" />}
         </FileInput>
+        
         <SectionTitle>Asignar Roles</SectionTitle>
         <CheckboxContainer>
           {allRoles.map((role) => (
             <label key={role}>
-              <input
-                type="checkbox"
-                checked={formData.roles.includes(role)}
-                onChange={() => toggleRole(role)}
-              />
+              <input type="checkbox" checked={formData.roles.includes(role)} onChange={() => toggleRole(role)} />
               &nbsp;{role}
             </label>
           ))}
         </CheckboxContainer>
+        
         <ButtonContainer>
           <EditTrainingButton type="submit">
-            <FontAwesomeIcon icon={faSave} />Actualizar Capacitación
+            <FontAwesomeIcon icon={faSave} /> Actualizar Capacitación
           </EditTrainingButton>
           <BackButton type="button" onClick={() => router.push('/table')}>
-            <FontAwesomeIcon icon={faArrowLeft} />Regresar
+            <FontAwesomeIcon icon={faArrowLeft} /> Regresar
           </BackButton>
         </ButtonContainer>
       </Form>
