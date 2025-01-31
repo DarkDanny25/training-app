@@ -9,7 +9,7 @@ import {
   EditUserInput, 
   EditUserButton, 
   BackButton, 
-  ButtonGroup
+  ButtonGroup 
 } from '../../frontend/styles/editUser.styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faSave } from '@fortawesome/free-solid-svg-icons';
@@ -48,8 +48,52 @@ const EditUser = () => {
     }
   }, [id]);
 
+  const validateName = (value) => {
+    if (value.trim().length < 3 || value.trim().length > 30) {
+      setNotificationMessage('El nombre debe tener entre 3 y 30 caracteres.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    }
+    return true;
+  };
+
+  const validateEmail = (value) => {
+    if (value.length < 5 || value.length > 50) {
+      setNotificationMessage('El correo debe tener entre 5 y 50 caracteres.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    }
+    return true;
+  };
+
+  const validateRole = (value) => {
+    const validRoles = ['asesor', 'asesorJR', 'gerente_sucursal', 'gerente_zona'];
+    if (!validRoles.includes(value)) {
+      setNotificationMessage('El rol debe ser uno de los siguientes: asesor, asesorJR, gerente_sucursal, gerente_zona.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    } else if (value.length > 25) {
+      setNotificationMessage('El rol no debe exceder los 25 caracteres.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isNameValid = validateName(name);
+    const isEmailValid = validateEmail(email);
+    const isRoleValid = validateRole(role);
+
+    if (!isNameValid || !isEmailValid || !isRoleValid) {
+      return;
+    }
 
     const updatedData = { name, email, role };
     const hasChanges = name !== user.name || email !== user.email || role !== user.role;
@@ -98,6 +142,7 @@ const EditUser = () => {
               placeholder="Nombre"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength="30"
               required
             />
             <EditUserInput
@@ -105,6 +150,7 @@ const EditUser = () => {
               placeholder="Correo Electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              maxLength="50"
               required
             />
             <EditUserInput
@@ -112,6 +158,7 @@ const EditUser = () => {
               placeholder="Rol"
               value={role}
               onChange={(e) => setRole(e.target.value)}
+              maxLength="25"
               required
             />
             <ButtonGroup>

@@ -32,6 +32,10 @@ const UserManagement = () => {
   const router = useRouter();
 
   const usersPerPage = 5;
+  const minLength = 3;
+  const maxLength = 50;
+
+  const truncateText = (text, length = 20) => text.length > length ? `${text.slice(0, length)}...` : text;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -48,9 +52,45 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (e) => {
+    let query = e.target.value.trim();
 
-  const handleEdit = (userId) => router.push(`/editUser/${userId}`);
+    if (query.length > maxLength) {
+      query = query.slice(0, maxLength);
+    }
+
+    setSearchTerm(query);
+
+    if (query === '') {
+      setNotification({ show: false, message: '', type: '' });
+      return;
+    }
+
+    if (query.length < minLength || query.length > maxLength) {
+      setNotification({
+        show: true,
+        message: `La búsqueda debe tener entre ${minLength} y ${maxLength} caracteres.`,
+        type: 'error',
+      });
+      return;
+    } else {
+      setNotification({ show: false, message: '', type: '' });
+    }
+  };
+
+  const filteredUsers = users.filter(
+    ({ name, email, role }) =>
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const handlePagination = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleDeleteClick = (userId) => {
     setUserToDelete(userId);
@@ -75,14 +115,7 @@ const UserManagement = () => {
       });
   };
 
-  const currentUsers = users
-    .filter(
-      ({ name, email, role }) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        role.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
+  const handleEdit = (userId) => router.push(`/editUser/${userId}`);
 
   return (
     <UserTableContainer>
@@ -94,12 +127,21 @@ const UserManagement = () => {
             placeholder="Buscar usuario..."
             value={searchTerm}
             onChange={handleSearch}
+            maxLength={maxLength}
           />
           <SearchIcon>
             <FontAwesomeIcon icon={faSearch} />
           </SearchIcon>
         </InputContainer>
       </SearchContainer>
+
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification({ show: false, message: '', type: '' })}
+        />
+      )}
 
       <UserTable>
         <UserTableHead>
@@ -113,9 +155,9 @@ const UserManagement = () => {
         <UserTableBody>
           {currentUsers.map(({ _id, name, email, role }) => (
             <UserTableRow key={_id}>
-              <UserTableCell>{name}</UserTableCell>
-              <UserTableCell>{email}</UserTableCell>
-              <UserTableCell>{role}</UserTableCell>
+              <UserTableCell>{truncateText(name, 40)}</UserTableCell>
+              <UserTableCell>{truncateText(email, 40)}</UserTableCell>
+              <UserTableCell>{truncateText(role, 40)}</UserTableCell>
               <UserTableCell>
                 <UserActionButton className="edit" onClick={() => handleEdit(_id)}>
                   <FontAwesomeIcon icon={faUserPen} />
@@ -130,10 +172,10 @@ const UserManagement = () => {
       </UserTable>
 
       <PaginationContainer>
-        {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
+        {Array.from({ length: totalPages }, (_, i) => (
           <PaginationButton
             key={i + 1}
-            onClick={() => setCurrentPage(i + 1)}
+            onClick={() => handlePagination(i + 1)}
             active={currentPage === i + 1}
           >
             {i + 1}
@@ -146,14 +188,6 @@ const UserManagement = () => {
         onClose={() => setModalOpen(false)}
         onDelete={handleDelete}
       />
-
-      {notification.show && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification({ show: false, message: '', type: '' })}
-        />
-      )}
     </UserTableContainer>
   );
 };

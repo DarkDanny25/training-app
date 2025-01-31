@@ -39,14 +39,46 @@ const AddFAQ = () => {
     setRoles(roles.length === rolesOptions.length ? [] : rolesOptions);
   };
 
+  const validateQuestion = (value) => {
+    if (value.trim().length < 5 || value.trim().length > 100) {
+      setNotification({ message: 'La pregunta debe tener entre 5 y 100 caracteres.', type: 'error' });
+      return false;
+    }
+    return true;
+  };
+
+  const validateAnswer = (value) => {
+    if (value.trim().length < 10 || value.trim().length > 500) {
+      setNotification({ message: 'La respuesta debe tener entre 10 y 500 caracteres.', type: 'error' });
+      return false;
+    }
+    return true;
+  };
+
+  const validateRoles = () => {
+    if (roles.length === 0) {
+      setNotification({ message: 'Debes seleccionar al menos un rol.', type: 'error' });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isQuestionValid = validateQuestion(question);
+    const isAnswerValid = validateAnswer(answer);
+    const areRolesValid = validateRoles();
+
+    if (!isQuestionValid || !isAnswerValid || !areRolesValid) {
+      return;
+    }
 
     try {
       const response = await axios.post(
         'http://localhost:5000/api/faqs',
         { question, answer, roles },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}`}}
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}`} }
       );
       setNotification({ message: response.data.message, type: 'success' });
       setTimeout(() => {
@@ -77,12 +109,14 @@ const AddFAQ = () => {
             placeholder="Pregunta"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
+            maxLength="100"
             required
           />
           <AddFAQTextArea
             placeholder="Respuesta"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
+            maxLength="500"
             required
           />
           <div>

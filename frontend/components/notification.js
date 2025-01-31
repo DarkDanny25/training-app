@@ -5,8 +5,10 @@ import { NotificationContainer, NotificationContent, CloseButton } from '../styl
 
 const Notification = ({ message, type, onClose }) => {
   useEffect(() => {
-    const timer = setTimeout(onClose, 3000);
-    return () => clearTimeout(timer); 
+    const timer = setTimeout(() => {
+      if (onClose) onClose();
+    }, 3000);
+    return () => clearTimeout(timer);
   }, [onClose]);
 
   const icon = type === 'success' ? faCheckCircle : faExclamationCircle;

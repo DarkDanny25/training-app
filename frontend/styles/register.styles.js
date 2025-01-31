@@ -187,7 +187,7 @@ export const Notification = styled.div`
 
 export const TipMessage = styled.p`
   position: absolute;
-  top: -45px;
+  bottom: 50%;
   left: 50%;
   transform: translateX(-50%);
   width: 280px;
@@ -198,7 +198,7 @@ export const TipMessage = styled.p`
   border-radius: 8px;
   text-align: center;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-  z-index: 1;
+  z-index: 10;
   animation: ${slideIn} 0.3s ease-out;
   transition: opacity 0.3s;
   pointer-events: none;
@@ -206,7 +206,7 @@ export const TipMessage = styled.p`
   &::before {
     content: '';
     position: absolute;
-    top: 100%;
+    bottom: -19px;
     left: 50%;
     transform: translateX(-50%);
     border-width: 10px;

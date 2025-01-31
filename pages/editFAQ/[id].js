@@ -59,8 +59,46 @@ const EditFAQ = () => {
     );
   };
 
+  const validateQuestion = (value) => {
+    if (value.trim().length < 5 || value.trim().length > 100) {
+      setNotificationMessage('La pregunta debe tener entre 5 y 100 caracteres.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    }
+    return true;
+  };
+
+  const validateAnswer = (value) => {
+    if (value.trim().length < 10 || value.trim().length > 500) {
+      setNotificationMessage('La respuesta debe tener entre 10 y 500 caracteres.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    }
+    return true;
+  };
+
+  const validateRoles = () => {
+    if (roles.length === 0) {
+      setNotificationMessage('Debes seleccionar al menos un rol para este FAQ.');
+      setNotificationType('error');
+      setShowNotification(true);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isQuestionValid = validateQuestion(question);
+    const isAnswerValid = validateAnswer(answer);
+    const areRolesValid = validateRoles();
+
+    if (!isQuestionValid || !isAnswerValid || !areRolesValid) {
+      return;
+    }
 
     const updatedData = { question, answer, roles };
     const hasChanges =
@@ -114,12 +152,14 @@ const EditFAQ = () => {
               placeholder="Pregunta"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
+              maxLength="100"
               required
             />
             <EditFAQTextArea
               placeholder="Respuesta"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
+              maxLength="500"
               required
             />
             <RoleContainer>

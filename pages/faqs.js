@@ -35,6 +35,9 @@ const FAQTable = () => {
   const [notification, setNotification] = useState(null);
   const router = useRouter();
 
+  const minLength = 3;
+  const maxLength = 50;
+
   const truncateText = (text, length = 20) => text.length > length ? `${text.slice(0, length)}...` : text;
 
   useEffect(() => {
@@ -61,7 +64,30 @@ const FAQTable = () => {
     fetchFaqs();
   }, []);
 
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
+  const handleSearchChange = (e) => {
+    let query = e.target.value.trim();
+
+    if (query.length > maxLength) {
+      query = query.slice(0, maxLength);
+    }
+
+    setSearchTerm(query);
+
+    if (query === '') {
+      setNotification(null);
+      return;
+    }
+
+    if (query.length < minLength || query.length > maxLength) {
+      setNotification({
+        type: 'error',
+        message: `La búsqueda debe tener entre ${minLength} y ${maxLength} caracteres.`
+      });
+      return;
+    } else {
+      setNotification(null);
+    }
+  };
 
   const filteredFaqs = faqs.filter(faq =>
     faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -118,6 +144,7 @@ const FAQTable = () => {
             placeholder="Buscar FAQ..."
             value={searchTerm}
             onChange={handleSearchChange}
+            maxLength={maxLength}
           />
           <SearchIcon>
             <FontAwesomeIcon icon={faSearch} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { 
@@ -21,13 +21,56 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [showTip, setShowTip] = useState(false);
-  const [tipDisabled, setTipDisabled] = useState(false);
+  const [showEmailTip, setShowEmailTip] = useState(false);
+  const [showPasswordTip, setShowPasswordTip] = useState(false);
   const router = useRouter();
+
+  const validateName = (value) => {
+    const trimmedValue = value.trim();
+    const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/;
+
+    if (trimmedValue.length < 3) {
+      setNotification({ message: "El nombre debe tener al menos 3 caracteres.", type: "error" });
+    } else if (trimmedValue.length > 30) {
+      setNotification({ message: "El nombre no puede tener más de 30 caracteres.", type: "error" });
+    } else if (!nameRegex.test(trimmedValue)) {
+      setNotification({ message: "El nombre solo puede contener letras y espacios.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setName(value);
+  };
+
+  const validateEmail = (value) => {
+    if (value.length < 5) {
+      setNotification({ message: "El email debe tener al menos 5 caracteres.", type: "error" });
+    } else if (value.length > 50) {
+      setNotification({ message: "El email no puede tener más de 50 caracteres.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setEmail(value);
+  };
+
+  const validatePassword = (value) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+
+    if (!passwordRegex.test(value)) {
+      setNotification({ message: "Porfavor, Ingrese una contraseña segura.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setPassword(value);
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setNotification(null);
+
+    if (notification && notification.type === "error") return;
 
     try {
       const response = await axios.post('http://localhost:5000/api/users/register', { name, email, password });
@@ -47,29 +90,11 @@ const Register = () => {
     setShowPassword(prevState => !prevState);
   };
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-
-    if (!tipDisabled) {
-      setShowTip(false);
-      setTipDisabled(true);
-    }
-  };
-
-  const handleFieldFocus = () => {
-    if (!tipDisabled) {
-      setShowTip(true);
-    }
-  };
-
-  const handleFieldBlur = () => {
-    setShowTip(false);
-  };
-
   return (
     <>
       <FormContainer onSubmit={handleRegister}>
         <Title>Registro</Title>
+
         <div style={{ position: 'relative' }}>
           <IconWrapper>
             <FontAwesomeIcon icon={faUser} />
@@ -78,16 +103,18 @@ const Register = () => {
             type="text"
             placeholder="Nombre"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => validateName(e.target.value)}
             required
+            maxLength="30"
           />
         </div>
+
         <div 
           style={{ position: 'relative' }} 
-          onFocus={handleFieldFocus}
-          onBlur={handleFieldBlur}
-          onMouseEnter={handleFieldFocus}
-          onMouseLeave={handleFieldBlur}
+          onFocus={() => setShowEmailTip(true)}
+          onBlur={() => setShowEmailTip(false)}
+          onMouseEnter={() => setShowEmailTip(true)}
+          onMouseLeave={() => setShowEmailTip(false)}
         >
           <IconWrapper>
             <FontAwesomeIcon icon={faEnvelope} />
@@ -96,16 +123,24 @@ const Register = () => {
             type="email"
             placeholder="Correo electrónico"
             value={email}
-            onChange={handleEmailChange}
+            onChange={(e) => validateEmail(e.target.value)}
             required
+            maxLength="50"
           />
-          {showTip && (
+          {showEmailTip && (
             <TipMessage>
               Tip: El email de acceso es tu mismo rol, por ejemplo: <b>@adviser.com</b> es para asesores.
             </TipMessage>
           )}
         </div>
-        <div style={{ position: 'relative' }}>
+
+        <div 
+          style={{ position: 'relative' }} 
+          onFocus={() => setShowPasswordTip(true)}
+          onBlur={() => setShowPasswordTip(false)}
+          onMouseEnter={() => setShowPasswordTip(true)}
+          onMouseLeave={() => setShowPasswordTip(false)}
+        >
           <IconWrapper>
             <FontAwesomeIcon icon={faLock} />
           </IconWrapper>
@@ -113,12 +148,18 @@ const Register = () => {
             type={showPassword ? 'text' : 'password'}
             placeholder="Contraseña"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => validatePassword(e.target.value)}
             required
+            maxLength="20"
           />
           <TogglePasswordButton type="button" onClick={togglePasswordVisibility}>
             <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
           </TogglePasswordButton>
+          {showPasswordTip && (
+            <TipMessage>
+              Tip: La contraseña debe tener al menos 8 caracteres, una <b>mayúscula</b>, una <b>minúscula</b>, un <b>número</b> y un <b>carácter especial (@$!%*?&)</b>.
+            </TipMessage>
+          )}
         </div>
 
         <Button type="submit">Registrarme</Button>

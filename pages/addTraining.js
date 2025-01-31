@@ -92,10 +92,42 @@ const AddTraining = () => {
     setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   };
 
+  const validateInputs = () => {
+    if (formData.title.length < 5 || formData.title.length > 100) {
+      showNotification('El título debe tener entre 5 y 100 caracteres.', 'error');
+      return false;
+    }
+    if (formData.description.length < 10 || formData.description.length > 500) {
+      showNotification('La descripción debe tener entre 10 y 500 caracteres.', 'error');
+      return false;
+    }
+    if (formData.section.length < 3 || formData.section.length > 50) {
+      showNotification('La sección debe tener entre 3 y 50 caracteres.', 'error');
+      return false;
+    }
+    if (formData.module && (formData.module.length < 3 || formData.module.length > 50)) {
+      showNotification('El módulo debe tener entre 3 y 50 caracteres.', 'error');
+      return false;
+    }
+    if (formData.submodule && (formData.submodule.length < 3 || formData.submodule.length > 50)) {
+      showNotification('El submódulo debe tener entre 3 y 50 caracteres.', 'error');
+      return false;
+    }
+    if (!formData.roles.length) {
+      showNotification('Debes seleccionar al menos un rol.', 'error');
+      return false;
+    }
+    if (formData.type && !file) {
+      showNotification('Debes cargar un archivo para el tipo seleccionado.', 'error');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
 
+    const token = localStorage.getItem('token');
     if (!token || !file) return showNotification('Por favor, selecciona un archivo', 'error');
 
     const { secure_url, original_filename } = file;
@@ -112,6 +144,10 @@ const AddTraining = () => {
       fileUrl: secure_url,
       originalFileName: original_filename,
     };
+
+    if (!validateInputs()) {
+      return;
+    }
 
     try {
       await axios.post('http://localhost:5000/api/training', data, {
@@ -134,19 +170,58 @@ const AddTraining = () => {
       <Form onSubmit={handleSubmit}>
         <Title>Agregar Capacitación</Title>
 
-        <Input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Título" required />
-        <Textarea name="description" value={formData.description} onChange={handleChange} placeholder="Descripción" required />
+        <Input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Título"
+          required
+          maxLength="100"
+        />
+        <Textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Descripción"
+          required
+          maxLength="500"
+        />
 
         <Select name="type" value={formData.type} onChange={handleChange} required>
           <option value="">Seleccione un tipo</option>
           {allTypes.map((type) => (
-            <option key={type} value={type}>{type === 'document' ? 'Documento' : 'Video'}</option>
+            <option key={type} value={type}>
+              {type === 'document' ? 'Documento' : 'Video'}
+            </option>
           ))}
         </Select>
 
-        <Input type="text" name="section" value={formData.section} onChange={handleChange} placeholder="Sección" required />
-        <Input type="text" name="module" value={formData.module} onChange={handleChange} placeholder="Módulo" />
-        <Input type="text" name="submodule" value={formData.submodule} onChange={handleChange} placeholder="Submódulo (opcional)" />
+        <Input
+          type="text"
+          name="section"
+          value={formData.section}
+          onChange={handleChange}
+          placeholder="Sección"
+          required
+          maxLength="50"
+        />
+        <Input
+          type="text"
+          name="module"
+          value={formData.module}
+          onChange={handleChange}
+          placeholder="Módulo"
+          maxLength="50"
+        />
+        <Input
+          type="text"
+          name="submodule"
+          value={formData.submodule}
+          onChange={handleChange}
+          placeholder="Submódulo (opcional)"
+          maxLength="50"
+        />
 
         <FileInput>
           <label onClick={handleWidgetOpen}>

@@ -33,6 +33,37 @@ const ForgotPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
+  const validateEmail = (value) => {
+    if (value.length < 5 || value.length > 50) {
+      setNotification({ message: "El email debe tener entre 5 y 50 caracteres.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+    setEmail(value);
+  };
+
+  const validatePassword = (value) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+    
+    if (!passwordRegex.test(value)) {
+      setNotification({ message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setNewPassword(value);
+  };
+
+  const validateConfirmPassword = (value) => {
+    if (value !== newPassword) {
+      setNotification({ message: "Las contraseñas no coinciden.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setConfirmPassword(value);
+  };
+
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     try {
@@ -40,7 +71,6 @@ const ForgotPassword = () => {
       setResetToken(response.data.resetToken);
       setNotification({ message: 'Token generado correctamente', type: 'success' });
       setShowModal(true);
-
       setTimeout(() => setNotification(null), 3000);
     } catch (error) {
       setNotification({ message: error.response?.data?.error || 'Error en el servidor', type: 'error' });
@@ -80,7 +110,7 @@ const ForgotPassword = () => {
       setTimeout(() => setNotification(null), 3000);
     }
   };
-  
+
   const handleCancel = () => {
     setEmail('');
     setNewPassword('');
@@ -100,8 +130,9 @@ const ForgotPassword = () => {
             type="email"
             placeholder="Ingresa tu correo electrónico"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => validateEmail(e.target.value)}
             required
+            maxLength="50"
           />
         </InputWrapper>
         <ButtonGenerateToken type="submit">
@@ -133,8 +164,9 @@ const ForgotPassword = () => {
                   type={showNewPassword ? 'text' : 'password'}
                   placeholder="Nueva contraseña"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => validatePassword(e.target.value)}
                   required
+                  maxLength="20"
                 />
                 <IconWrapperRight onClick={() => setShowNewPassword(!showNewPassword)}>
                   <FontAwesomeIcon icon={showNewPassword ? faEye : faEyeSlash} />
@@ -148,8 +180,9 @@ const ForgotPassword = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirma tu contraseña"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => validateConfirmPassword(e.target.value)}
                   required
+                  maxLength="20"
                 />
                 <IconWrapperRight onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                   <FontAwesomeIcon icon={showConfirmPassword ? faEye : faEyeSlash} />

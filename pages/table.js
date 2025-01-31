@@ -27,6 +27,7 @@ import Notification from '../frontend/components/notification';
 
 const TrainingTable = () => {
   const [trainings, setTrainings] = useState([]);
+  const [filteredTrainings, setFilteredTrainings] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
@@ -34,6 +35,9 @@ const TrainingTable = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTraining, setSelectedTraining] = useState(null);
   const router = useRouter();
+
+  const minLength = 3;
+  const maxLength = 50;
 
   useEffect(() => {
     fetchTrainings();
@@ -46,6 +50,7 @@ const TrainingTable = () => {
       });
       const trainingsArray = Object.values(data).flatMap(modules => Object.values(modules).flatMap(training => training));
       setTrainings(trainingsArray);
+      setFilteredTrainings(trainingsArray);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -53,13 +58,40 @@ const TrainingTable = () => {
     }
   };
 
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
+  const handleSearchChange = (e) => {
+    let query = e.target.value.trim();
 
-  const filteredTrainings = trainings.filter((training) =>
-    [training.title, training.description, training.type, training.roles.join(', '), 
-     training.originalFileName, training.fileUrl, training.section, training.module, training.submodule]
-     .some(val => val?.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+    if (query.length > maxLength) {
+      query = query.slice(0, maxLength);
+    }
+
+    setSearchTerm(query);
+
+    if (query === '') {
+      setFilteredTrainings(trainings);
+      setNotification(null);
+      return;
+    }
+
+    if (query.length < minLength || query.length > maxLength) {
+      setNotification({
+        type: 'error',
+        message: `La búsqueda debe tener entre ${minLength} y ${maxLength} caracteres.`
+      });
+      setFilteredTrainings([]);
+      return;
+    } else {
+      setNotification(null);
+    }
+
+    const filtered = trainings.filter((training) =>
+      [training.title, training.description, training.type, training.roles.join(', '), 
+       training.originalFileName, training.fileUrl, training.section, training.module, training.submodule]
+       .some(val => val?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    setFilteredTrainings(filtered);
+  };
 
   const handlePagination = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -97,6 +129,7 @@ const TrainingTable = () => {
             placeholder="Buscar..."
             value={searchTerm}
             onChange={handleSearchChange}
+            maxLength={maxLength}
           />
           <SearchIcon>
             <FontAwesomeIcon icon={faSearch} />

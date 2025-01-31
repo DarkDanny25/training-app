@@ -25,6 +25,10 @@ const CapacitationPage = () => {
   const [filteredMaterials, setFilteredMaterials] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [noMaterialsError, setNoMaterialsError] = useState(false);
+  const [error, setError] = useState('');
+  
+  const minLength = 3;
+  const maxLength = 50;
 
   useEffect(() => {
     const fetchMaterials = async () => {
@@ -56,6 +60,14 @@ const CapacitationPage = () => {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
+
+    if (query.length < minLength || query.length > maxLength) {
+      setError(`La búsqueda debe tener entre ${minLength} y ${maxLength} caracteres.`);
+      setFilteredMaterials({});
+      return;
+    } else {
+      setError('');
+    }
 
     const filtered = Object.keys(materials).reduce((acc, section) => {
       const filteredModules = Object.keys(materials[section]).reduce((modAcc, module) => {
@@ -99,15 +111,27 @@ const CapacitationPage = () => {
     <ContentContainer>
       <Title>Material de Capacitación</Title>
       
-      <InputSearch value={searchQuery} onChange={handleSearch}>
-        <input type="text" placeholder="Búsqueda de Materiales..." />
+      <InputSearch>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearch}
+          placeholder="Búsqueda de Materiales..."
+          maxLength={maxLength}
+        />
         <IconWrapper>
           <FontAwesomeIcon icon={faSearch} />
         </IconWrapper>
       </InputSearch>
       
       <SectionDivider />
-
+      
+      {error && (
+        <ErrorBadge>
+          <FontAwesomeIcon icon={faExclamationCircle} style={{ fontSize: '15px' }} /> {error}
+        </ErrorBadge>
+      )}
+      
       {noMaterialsError ? (
         <ErrorBadge>
           <FontAwesomeIcon icon={faExclamationCircle} style={{ fontSize: '15px' }} /> No hay materiales de capacitación disponibles.

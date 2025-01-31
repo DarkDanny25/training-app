@@ -22,8 +22,34 @@ const Login = () => {
   const [notification, setNotification] = useState(null);
   const router = useRouter();
 
+  const validateEmail = (value) => {
+    if (value.length < 5) {
+      setNotification({ message: "El email debe tener al menos 5 caracteres.", type: "error" });
+    } else if (value.length > 50) {
+      setNotification({ message: "El email no puede tener más de 50 caracteres.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setEmail(value);
+  };
+
+  const validatePassword = (value) => {
+    if (value.length < 8) {
+      setNotification({ message: "La contraseña debe tener al menos 8 caracteres.", type: "error" });
+    } else if (value.length > 20) {
+      setNotification({ message: "La contraseña no puede tener más de 20 caracteres.", type: "error" });
+    } else {
+      setNotification(null);
+    }
+
+    setPassword(value);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (notification && notification.type === "error") return;
 
     try {
       const { data } = await axios.post('http://localhost:5000/api/users/login', { email, password });
@@ -35,7 +61,7 @@ const Login = () => {
       setNotification({ message: 'Inicio de sesión exitoso', type: 'success' });
 
       setTimeout(() => {
-       router.push('/welcome');
+        router.push('/welcome');
       }, 3000);
 
     } catch (error) {
@@ -64,8 +90,9 @@ const Login = () => {
             type="email"
             placeholder="Correo electrónico"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => validateEmail(e.target.value)}
             required
+            maxLength="50"
           />
         </InputWrapper>
         <InputWrapper>
@@ -76,8 +103,9 @@ const Login = () => {
             type={showPassword ? 'text' : 'password'}
             placeholder="Contraseña"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => validatePassword(e.target.value)}
             required
+            maxLength="20"
           />
           <TogglePasswordButton type="button" onClick={() => setShowPassword(!showPassword)}>
             <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />

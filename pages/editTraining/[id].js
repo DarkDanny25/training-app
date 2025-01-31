@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import axios from 'axios';
-import {
-  Container,
-  Title,
-  Form,
-  Input,
-  Textarea,
-  FileInput,
-  CheckboxContainer,
-  SectionTitle,
-  ButtonContainer,
-  BackButton,
-  Select,
-  EditTrainingButton
+import { useRouter } from 'next/router';
+import Notification from '../../frontend/components/notification';
+import { 
+  Container, 
+  Title, 
+  Form, 
+  Input, 
+  Textarea, 
+  FileInput, 
+  CheckboxContainer, 
+  SectionTitle, 
+  ButtonContainer, 
+  BackButton, 
+  Select, 
+  EditTrainingButton 
 } from '../../frontend/styles/editTraining.styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faUpload, faSave } from '@fortawesome/free-solid-svg-icons';
-import Notification from '../../frontend/components/notification';
 
 const EditTraining = () => {
   const router = useRouter();
@@ -139,10 +139,46 @@ const EditTraining = () => {
     setTimeout(() => setShowNotification(false), 3000);
   };
 
+  const validateInputs = () => {
+    if (formData.title.length < 5 || formData.title.length > 100) {
+      handleNotification('El título debe tener entre 5 y 100 caracteres.', 'error');
+      return false;
+    }
+    if (formData.description.length < 10 || formData.description.length > 500) {
+      handleNotification('La descripción debe tener entre 10 y 500 caracteres.', 'error');
+      return false;
+    }
+    if (formData.section.length < 3 || formData.section.length > 50) {
+      handleNotification('La sección debe tener entre 3 y 50 caracteres.', 'error');
+      return false;
+    }
+    if (formData.module && (formData.module.length < 3 || formData.module.length > 50)) {
+      handleNotification('El módulo debe tener entre 3 y 50 caracteres.', 'error');
+      return false;
+    }
+    if (formData.submodule && (formData.submodule.length < 3 || formData.submodule.length > 50)) {
+      handleNotification('El submódulo debe tener entre 3 y 50 caracteres.', 'error');
+      return false;
+    }
+    if (!formData.roles.length) {
+      handleNotification('Debes seleccionar al menos un rol.', 'error');
+      return false;
+    }
+    if (formData.type && !fileUrl) {
+      handleNotification('Debes cargar un archivo para el tipo seleccionado.', 'error');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     if (!token) return;
+
+    if (!validateInputs()) {
+      return;
+    }
 
     const updatedData = {
       ...formData,
