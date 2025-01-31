@@ -58,7 +58,7 @@ const Register = () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
 
     if (!passwordRegex.test(value)) {
-      setNotification({ message: "Porfavor, Ingrese una contraseña segura.", type: "error" });
+      setNotification({ message: "Por favor, ingrese una contraseña segura.", type: "error" });
     } else {
       setNotification(null);
     }
@@ -111,9 +111,9 @@ const Register = () => {
 
         <div 
           style={{ position: 'relative' }} 
-          onFocus={() => setShowEmailTip(true)}
+          onFocus={() => setShowEmailTip(email === '')}
           onBlur={() => setShowEmailTip(false)}
-          onMouseEnter={() => setShowEmailTip(true)}
+          onMouseEnter={() => setShowEmailTip(email === '')}
           onMouseLeave={() => setShowEmailTip(false)}
         >
           <IconWrapper>
@@ -123,7 +123,10 @@ const Register = () => {
             type="email"
             placeholder="Correo electrónico"
             value={email}
-            onChange={(e) => validateEmail(e.target.value)}
+            onChange={(e) => {
+              validateEmail(e.target.value);
+              setShowEmailTip(e.target.value === '');
+            }}
             required
             maxLength="50"
           />
@@ -136,9 +139,9 @@ const Register = () => {
 
         <div 
           style={{ position: 'relative' }} 
-          onFocus={() => setShowPasswordTip(true)}
+          onFocus={() => setShowPasswordTip(password === '')}
           onBlur={() => setShowPasswordTip(false)}
-          onMouseEnter={() => setShowPasswordTip(true)}
+          onMouseEnter={() => setShowPasswordTip(password === '')}
           onMouseLeave={() => setShowPasswordTip(false)}
         >
           <IconWrapper>
@@ -148,7 +151,10 @@ const Register = () => {
             type={showPassword ? 'text' : 'password'}
             placeholder="Contraseña"
             value={password}
-            onChange={(e) => validatePassword(e.target.value)}
+            onChange={(e) => {
+              validatePassword(e.target.value);
+              setShowPasswordTip(e.target.value === '');
+            }}
             required
             maxLength="20"
           />
